@@ -14,6 +14,7 @@ const createNode = (data: CreateNodeType, totalNodes = 5) => {
     id: uuid,
     position: newPosition,
     type: 'CustomNode',
+    draggable: false,
     data: {
       onClick,
       position: newPosition,

@@ -30,11 +30,15 @@ const nodeTypes = {
 
 const RenderTree = () => {
   const { getCache, setCache } = useCache('food_explorer');
-  const [nodes, setNodes, onNodesChange] = useNodesState<NodeTypes>([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState<EdgesTypes>([]);
+  const [nodes, setNodes] = useNodesState<NodeTypes>([]);
+  const [edges, setEdges] = useEdgesState<EdgesTypes>([]);
   const [showDetails, setShowDetails] = useState(null);
+  const [isLoading, setLoading] = useState(false);
 
   const handleNodeClick = (data: NodeDataTypes) => {
+    if ((data.label !== 'View Tags') && (data.label !== 'View Details')) {
+      setLoading(true);
+    }
     handleFetch(data);
   };
 
@@ -51,6 +55,8 @@ const RenderTree = () => {
       ...prev.filter((p) => p.level < source.level),
       ...newEdges,
     ]);
+
+    setLoading(false);
   };
 
   const handleNodes = (
@@ -265,6 +271,7 @@ const RenderTree = () => {
         id: 'explore',
         position: { x: 100, y: 100 },
         type: 'CustomNode',
+        draggable: false,
         data: {
           onClick: handleNodeClick,
           id: 'explore',
@@ -286,12 +293,15 @@ const RenderTree = () => {
 
   return (
     <div style={{ width: '100vw', height: '100vh' }}>
+      <div className="p-1 pl-3 border shadow">Food Explorer</div>
+      {isLoading && (
+        <div className="fixed top-12 left-5 bg-red-600 px-6 py-1 rounded-md text-white">
+          loading...
+        </div>
+      )}
       <ReactFlow
         nodes={nodes}
         edges={edges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        // onConnect={onConnect}
         nodeTypes={nodeTypes}
         defaultEdgeOptions={defaultEdgeOptions}
       >

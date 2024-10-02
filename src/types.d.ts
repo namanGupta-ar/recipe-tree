@@ -34,6 +34,7 @@ type NodeTypes = {
   id: string; // it is also an uuid,
   position: PositionType;
   type: string;
+  draggable: boolean;
   // type: 'CustomNode';
   data: NodeDataTypes;
 };
