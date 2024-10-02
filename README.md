@@ -4,6 +4,7 @@
 This React application is a dynamic food exploration tool that visualizes categories of food and meals as an interactive tree using React Flow. The app allows users to explore various food categories, view meals, ingredients, and details in a structured manner with endless possibilities of navigation.
 
 
+[Deployment](https://food-explorer-yum.netlify.app/)
 
 
 ## 🚀 Features
