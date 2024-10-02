@@ -45,7 +45,8 @@ type PositionType = {
 type NodeDataTypes = {
   id: string; // id from api to perform caching
   uuid: string; // unique id to render tree
-  parentId?: string; // available in case of view nodes
+  parentId?: string; // available in case of view nodes to do caching and api calls
+  parentLabel?: string; // available in case of view nodes to do caching and api calls
   label: string;
   img?: string;
   clickToGet: string;
@@ -117,7 +118,7 @@ const RenderTree = () => {
     handleEdges(source, newNodes);
   };
 
-  const addMealDetails = (source: NodeDataTypes) => {
+  const viewMealDetailsTags = (source: NodeDataTypes) => {
     // 1. view ingredients
     // 2. veiw tags
     // 3. view Details
@@ -136,7 +137,7 @@ const RenderTree = () => {
         clickToGet: 'showDetails',
       },
     ];
-
+    console.log("creating tag for ",id);
     const newNodes: NodeTypes[] = viewNodes.map((node, i) => {
       const { label, clickToGet } = node;
       const generatedId = (Date.now() - i).toString();
@@ -155,6 +156,24 @@ const RenderTree = () => {
     handleNodes(source, newNodes, level + 1);
   };
 
+
+  const viewMealTag = (source: NodeDataTypes, clickToGet: string) => {
+    const {id, level, position, label} = source;
+    const generatedId = (Date.now()).toString();
+    const viewNode = [createNode({
+      id: generatedId,
+      parentId: id,
+      parentLabel: label,
+      label: "View Meals",
+      clickToGet,
+      level: level + 1,
+      sPos: position,
+      index: 0,
+      onClick: handleNodeClick,
+    })];
+    handleNodes(source, viewNode, level + 1);
+  }
+
   const getIngredientsFromDetails = (source: NodeDataTypes, sourceParentId: string) => {
     // source: view node, sourceParent: meal node id to get cached value
     const { position, level } = source;
@@ -162,17 +181,20 @@ const RenderTree = () => {
     if (mealDetails) {
       const ingredientNodes: NodeTypes[] = [];
       for (let i = 1; i <= 20; i++) {
+        const label = mealDetails[`strIngredient${i}`];
         if (mealDetails[`strIngredient${i}`]) {
-          const id = (Date.now() + i).toString();
-           ingredientNodes.push(createNode({
-             id,
-             label: mealDetails[`strIngredient${i}`],
-             clickToGet: 'mealsByIngredient',
-             level: level + 1,
-             sPos: position,
-             index: i,
-             onClick: handleNodeClick,
-           }))
+          // const id = (Date.now() + i).toString();
+           ingredientNodes.push(
+             createNode({
+               id: label.replace(/\s+/g, '_'),
+               label,
+               clickToGet: 'viewMealsByIngredientsTag', // to get view meal tag
+               level: level + 1,
+               sPos: position,
+               index: i,
+               onClick: handleNodeClick,
+             })
+           );
         }
       }
       handleNodes(source, ingredientNodes, level + 1);
@@ -180,7 +202,9 @@ const RenderTree = () => {
   };
 
   const handleFetch = async (data: NodeDataTypes) => {
-    const { id, clickToGet, label, position, level, parentId } = data;
+    console.log("node clicked", data);
+    const { id, clickToGet, position, level, parentId, parentLabel } =
+      data;
     switch (clickToGet) {
       case 'category':
         let mealCategories: CategoriesApiTypes[] = getCache(id);
@@ -194,7 +218,8 @@ const RenderTree = () => {
           return createNode({
             id,
             label,
-            clickToGet: 'mealsByCategory',
+            // clickToGet: 'mealsByCategory',
+            clickToGet: 'viewMealsByCategoryTag',
             level: level + 1,
             sPos: position,
             index: i,
@@ -204,11 +229,13 @@ const RenderTree = () => {
         handleNodes(data, requiredMeals, level + 1);
         break;
       case 'mealsByCategory':
-        let mealsByCategory: MealsApiTypes[] = getCache(id);
+        let mealsByCategory: MealsApiTypes[] = getCache(parentId ?? "");
         if (!mealsByCategory) {
-          const meals = await fetchMealsByCategory(label);
+          const meals = await fetchMealsByCategory(parentLabel ?? "");
           mealsByCategory = meals.slice(0, 5);
-          setCache(id, mealsByCategory);
+          if(parentId) {
+            setCache(parentId, mealsByCategory);
+          }
         }
         const requiredMealsByCategory = mealsByCategory.map((m, i) => {
           const { idMeal: id, strMeal: label, strMealThumb: img } = m;
@@ -231,14 +258,15 @@ const RenderTree = () => {
           mealDetails = await fetchFullDetails(id);
           setCache(id, mealDetails);
         }
-        addMealDetails(data);
+        viewMealDetailsTags(data);
         break;
       case 'mealsByIngredient':
-        let mealsByIng: MealsApiTypes[] = getCache(id);
+        console.log('mealsByIngredient', parentId);
+        let mealsByIng: MealsApiTypes[] = getCache(parentId ?? "");
         if (!mealsByIng) {
-          const meals = await fetchMealsByIngredient(label);
+          const meals = await fetchMealsByIngredient(parentId ?? "");
           mealsByIng = meals.slice(0, 5);
-          setCache(id, mealsByIng);
+          if (parentId) setCache(parentId, mealsByIng);
         }
         const requiredMealsByIng: NodeTypes[] = mealsByIng.map((m: any, i) => {
           const { idMeal: id, strMeal: label, strMealThumb: img } = m;
@@ -256,7 +284,13 @@ const RenderTree = () => {
         handleNodes(data, requiredMealsByIng, level + 1);
         break;
       case 'showIngredients':
-        getIngredientsFromDetails(data, parentId ?? "");
+        getIngredientsFromDetails(data, parentId ?? ""); // when view ingredient tag is clicked
+        break;
+      case 'viewMealsByIngredientsTag': 
+          viewMealTag(data, 'mealsByIngredient'); // if view meal tag is clicked after ingredient
+        break;
+      case 'viewMealsByCategoryTag': // if view meal tag is clicked after category
+          viewMealTag(data, 'mealsByCategory');
         break;
       case 'showPopup':
         console.log('Showing popup');
