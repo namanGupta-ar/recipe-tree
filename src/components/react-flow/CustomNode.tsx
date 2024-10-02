@@ -8,7 +8,7 @@ const CustomNode = ({ data}) => {
   return (
     <>
       <Handle type="target" position={Position.Left} />
-      <div  className='px-10 py-3 border-2 border-black' onClick={() => data.onClick(data)} >{data.label} {data.level}</div>
+      <div  className='px-10 py-3 border-2 border-black' onClick={() => data.onClick(data)} >{data.label} </div>
       <Handle type="source" position={Position.Right} />
     </>
   );
