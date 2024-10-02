@@ -65,5 +65,6 @@ cd recipe-tree
 - React: Frontend framework.
 - React Flow: To create and visualize the dynamic tree structure.
 - Tailwind CSS: For styling the app.
+- Recipe Api: [link](https://www.themealdb.com/api.php)
 ## 💾 Caching
 Caching is implemented to minimize API calls. Once a node is clicked and data is fetched, it is stored in a cache. When the same node or data is requested again, the app retrieves the information from the cache instead of making another API call, improving efficiency.
