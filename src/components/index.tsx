@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 
 import {
   Background,
@@ -26,6 +26,7 @@ import IconGlobeOutline from '../icons/Globe';
 import FoodIcon from '../icons/Food';
 import IconBxFoodMenu from '../icons/Menu';
 import IconIngredient from '../icons/Ingredient';
+import DetailsPopup from './DetailsPopup';
 
 type CategoriesApiTypes = {
   idCategory?: string;
@@ -85,6 +86,7 @@ const RenderTree = () => {
   const { getCache, setCache } = useCache('food_explorer');
   const [nodes, setNodes, onNodesChange] = useNodesState<NodeTypes>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<EdgesTypes>([]);
+  const [showDetails, setShowDetails] = useState(null);
 
   const handleNodeClick = (data: NodeDataTypes) => {
     handleFetch(data);
@@ -134,10 +136,9 @@ const RenderTree = () => {
       },
       {
         label: 'View Details',
-        clickToGet: 'showDetails',
+        clickToGet: 'showPopup',
       },
     ];
-    console.log('creating tag for ', id);
     const newNodes: NodeTypes[] = viewNodes.map((node, i) => {
       const { label, clickToGet } = node;
       const generatedId = (Date.now() - i).toString();
@@ -305,7 +306,6 @@ const RenderTree = () => {
         viewMealDetailsTags(data);
         break;
       case 'mealsByIngredient':
-        console.log('mealsByIngredient', parentId);
         let mealsByIng: MealsApiTypes[] = getCache(parentId ?? '');
         if (!mealsByIng) {
           const meals = await fetchMealsByIngredient(parentId ?? '');
@@ -337,10 +337,12 @@ const RenderTree = () => {
         viewMealTag(data, 'mealsByCategory');
         break;
       case 'showPopup':
-        console.log('Showing popup');
+        const mealFullDetails = getCache(parentId ?? '');
+        setShowDetails(mealFullDetails);
         break;
     }
   };
+
   useEffect(() => {
     const initialNodes: NodeTypes[] = [
       {
@@ -362,6 +364,10 @@ const RenderTree = () => {
     setNodes(initialNodes);
   }, []);
 
+  const handlePopupClose = () => {
+    setShowDetails(null);
+  };
+
   return (
     <div style={{ width: '100vw', height: '100vh' }}>
       <ReactFlow
@@ -377,6 +383,12 @@ const RenderTree = () => {
         <MiniMap />
         <Background variant="dots" gap={12} size={1} />
       </ReactFlow>
+      {showDetails && (
+        <DetailsPopup
+          mealDetails={showDetails}
+          handlePopupClose={handlePopupClose}
+        />
+      )}
     </div>
   );
 };

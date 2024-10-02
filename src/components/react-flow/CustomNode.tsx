@@ -4,7 +4,6 @@ import { memo } from 'react';
 import { Handle, Position } from '@xyflow/react';
 
 const CustomNode = ({ data }) => {
-  console.log("showed data", data);
   return (
     <>
       <Handle
