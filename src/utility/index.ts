@@ -8,17 +8,20 @@ const calculatePosition = (pos, index) => {
 };
 
 const createNode = (data) => {
-  const { id, label, img, clickToGet, level, sPos, index, type, onClick } =
+  const { id, label, img, clickToGet, level, sPos, index, type, onClick, parentId } =
     data;
   const newPosition = calculatePosition(sPos, index);
+  const uuid = (Date.now() + index).toString();
   return {
-    id,
+    id: uuid,
     position: newPosition,
     type: 'CustomNode',
     data: {
       onClick,
       position: newPosition,
       id,
+      parentId,
+      uuid,
       label,
       clickToGet,
       img: img ?? '',
