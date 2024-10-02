@@ -1,7 +1,8 @@
-import React, { ReactNode, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import {
   Background,
+  BackgroundVariant,
   Controls,
   MiniMap,
   ReactFlow,
@@ -10,7 +11,6 @@ import {
 } from '@xyflow/react';
 
 import '@xyflow/react/dist/style.css';
-// import {CategoriesApiTypes } from 'types/api' // todo
 import CustomNode from './react-flow/CustomNode';
 import { defaultEdgeOptions } from './react-flow/reactFlowConfig';
 import {
@@ -21,62 +21,8 @@ import {
 } from '../api';
 import { createNode } from '../utility';
 import useCache from './common/useCache';
-import ShareIcon from '../icons/Share';
-import IconGlobeOutline from '../icons/Globe';
-import FoodIcon from '../icons/Food';
-import IconBxFoodMenu from '../icons/Menu';
-import IconIngredient from '../icons/Ingredient';
 import DetailsPopup from './DetailsPopup';
-
-type CategoriesApiTypes = {
-  idCategory?: string;
-  strCategory?: string;
-};
-
-type MealsApiTypes = {
-  idMeal?: string;
-  strMeal?: string;
-  strMealThumb?: string;
-};
-
-type PositionType = {
-  x: number;
-  y: number;
-};
-
-type NodeDataTypes = {
-  id: string; // id from api to perform caching
-  uuid: string; // unique id to render tree
-  parentId?: string; // available in case of view nodes to do caching and api calls
-  parentLabel?: string; // available in case of view nodes to do caching and api calls
-  label: string;
-  img?: ReactNode;
-  clickToGet: string;
-  type?: string;
-  level: number;
-  position: PositionType;
-  onClick: (data: NodeDataTypes) => void;
-};
-
-type NodeTypes = {
-  id: string; // it is also an uuid,
-  position: PositionType;
-  type: string;
-  // type: 'CustomNode';
-  data: NodeDataTypes;
-};
-
-type EdgesTypes = {
-  id: string;
-  source: string;
-  target: string;
-  level: number;
-};
-
-type ViewNodeTypes = {
-  label: string;
-  clickToGet?: string;
-};
+import renderIcon from './common/RenderIcon';
 
 const nodeTypes = {
   CustomNode,
@@ -198,7 +144,6 @@ const RenderTree = () => {
       for (let i = 1; i <= 5; i++) {
         const label = mealDetails[`strIngredient${i}`];
         if (mealDetails[`strIngredient${i}`]) {
-          // const id = (Date.now() + i).toString();
           ingredientNodes.push(
             createNode({
               id: label.replace(/\s+/g, '_'),
@@ -217,36 +162,7 @@ const RenderTree = () => {
     }
   };
 
-  const renderIcon = (type: string) => {
-    switch (type) {
-      case 'meal':
-        return (
-          <p className="h-5 w-5 rounded p-[2.5px] bg-blue-600">
-            <FoodIcon height={15} width={15} color="white" />
-          </p>
-        );
-      case 'menu':
-        return (
-          <p className="h-5 w-5 rounded p-[2.5px] bg-red-600">
-            <IconBxFoodMenu height={15} width={15} color="white" />
-          </p>
-        );
-      case 'share':
-        return <ShareIcon color="lime" height={20} width={20} />;
-      case 'explore':
-        return (
-          <p className="h-5 w-5 rounded p-[2.5px] bg-slate-700">
-            <IconGlobeOutline height={15} width={15} color="white" />
-          </p>
-        );
-      case 'ingredient':
-        return (
-          <p className="h-5 w-5 rounded p-[2.5px] bg-purple-700">
-            <IconIngredient height={15} width={15} color="white" />
-          </p>
-        );
-    }
-  };
+
 
   const handleFetch = async (data: NodeDataTypes) => {
     const { id, clickToGet, position, level, parentId, parentLabel } = data;
@@ -381,7 +297,7 @@ const RenderTree = () => {
       >
         <Controls />
         <MiniMap />
-        <Background variant="dots" gap={12} size={1} />
+        <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
       </ReactFlow>
       {showDetails && (
         <DetailsPopup

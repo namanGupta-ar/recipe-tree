@@ -1,5 +1,4 @@
 import React from 'react';
-import { tempDetais } from './temp';
 import IconCross1 from '../icons/Cross';
 
 type PillProps = {
@@ -12,18 +11,18 @@ type DetailsProps = {
 };
 
 const tailwindColors = [
-  'red',
-  'blue',
-  'green',
-  'yellow',
-  'purple',
-  'pink',
-  'indigo',
-  'teal',
-  'orange',
-  'cyan',
-  'lime',
-  'rose',
+  'bg-red-500',
+  'bg-blue-500',
+  'bg-green-500',
+  'bg-yellow-500',
+  'bg-purple-500',
+  'bg-pink-500',
+  'bg-indigo-500',
+  'bg-teal-500',
+  'bg-orange-500',
+  'bg-cyan-500',
+  'bg-lime-500',
+  'bg-rose-500',
 ];
 
 function getRandomTailwindColor() {
@@ -31,13 +30,12 @@ function getRandomTailwindColor() {
   return tailwindColors[randomIndex];
 }
 
+
 const Pill: React.FC<PillProps> = ({ label }) => {
   const randomColor = getRandomTailwindColor();
-  const borderColor = `border-${randomColor}-500`;
-  const backgroundColor = `bg-${randomColor}-500/20`;
   return (
     <p
-      className={`rounded-full text-${randomColor}-700 border-2 ${borderColor} ${backgroundColor} py-1 px-3 text-xs`}
+      className={`rounded-full py-1 px-3 text-xs ${randomColor}`}
     >
       {label}
     </p>
@@ -56,6 +54,7 @@ const DetailsPopup: React.FC<DetailsProps> = ({
     strArea,
     strYoutube,
     strInstructions,
+    strSource,
   } = mealDetails;
 
   const tags = strTags ? strTags.split(',') : [];
@@ -75,7 +74,7 @@ const DetailsPopup: React.FC<DetailsProps> = ({
     },
     {
       type: 'Recipe',
-      desc: strYoutube, // tocheck
+      desc: strSource, 
     },
   ];
 
@@ -94,7 +93,7 @@ const DetailsPopup: React.FC<DetailsProps> = ({
       )}
       {tags && (
         <div className="flex gap-2">
-          {tags.map((tag: string, i) => (
+          {tags.map((tag: string, i: number) => (
             <Pill label={tag} key={i} />
           ))}
         </div>
@@ -103,7 +102,7 @@ const DetailsPopup: React.FC<DetailsProps> = ({
         details.map((d) => (
           <div className="flex w-full text-gray-600 text-xs">
             <p className="w-1/2">{d.type}</p>
-            <p className="w-1/2 break-words">{d.desc}</p>
+            <a className="w-1/2 break-words" href={d.desc} target='_blank'>{d.desc}</a>
           </div>
         ))}
       {strInstructions && (
