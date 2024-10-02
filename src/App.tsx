@@ -1,10 +1,8 @@
 import './App.css';
-import FoodExplorer from './components';
-import RenderTree from './components/RenderTree';
+import RenderTree from './components';
 
 function App() {
   return (
-      // <FoodExplorer />
       <RenderTree />
   );
 }

@@ -4,11 +4,11 @@ import { MarkerType } from "@xyflow/react";
 
 
   const defaultEdgeOptions = {
-    style: { strokeWidth: 1.3, stroke: 'black' },
+    style: { strokeWidth: 1, stroke: 'grey' },
     type: 'floating',
     markerEnd: {
       type: MarkerType.ArrowClosed,
-      color: 'black',
+      color: 'grey',
     },
   };
 

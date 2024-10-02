@@ -1,16 +1,16 @@
-// @ts-nocheck
 
-const calculatePosition = (pos, index) => {
+// @ts-nocheck
+const calculatePosition = (pos, index, totalNodes) => {
   return {
-    x: pos.x + 250,
-    y: pos.y + index * 80,
+    x: pos.x + 300,
+    y: (pos.y - (totalNodes/2)*80) + index * 80,
   };
 };
 
-const createNode = (data) => {
+const createNode = (data, totalNodes = 5) => {
   const { id, label, img, clickToGet, level, sPos, index, type, onClick, parentId, parentLabel } =
     data;
-  const newPosition = calculatePosition(sPos, index);
+  const newPosition = calculatePosition(sPos, index, totalNodes);
   const uuid = (Date.now() + index).toString();
   return {
     id: uuid,
